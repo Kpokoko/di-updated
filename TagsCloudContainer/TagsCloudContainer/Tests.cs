@@ -10,8 +10,7 @@ namespace TagsCloudContainer;
 public class Tests
 {
     private Point _center;
-    private Size _size;
-    private IFileHandler _fileHandler;
+    private Size _firstRectSize;
     private string _filePath = "TestData";
     private IContainer _container;
     
@@ -19,12 +18,9 @@ public class Tests
     public void Setup()
     {
         _center = new Point(400, 400);
-        _size = new Size(10, 20);
-        _fileHandler = new TXTHndler();
-
-        var builder = new ContainerBuilder();
-        builder.RegisterInstance(new CircularCloudLayouter(_center)).As<ILayouter>();
-        _container = builder.Build();
+        _firstRectSize = new Size(30, 20);
+        
+        _container = ContainerComposer.Compose(_center, _firstRectSize);
     }
     
     [Test]
@@ -32,7 +28,9 @@ public class Tests
     {
         var expectedData = new List<string> { "odin" };
         
-        var data = _fileHandler.ReadFile(Path.Combine(_filePath,
+        var data = _container
+            .Resolve<IFileHandler>()
+            .ReadFile(Path.Combine(_filePath,
             "IFileHandler_ReadFile_Should_CorrectlyReadText.txt"));
         
         data.Should().BeEquivalentTo(expectedData);
@@ -44,7 +42,9 @@ public class Tests
         var inputData = new List<string> { "скучное", "слово", "в", "СЛОВО" };
         var expectedData = new[] { "слово", "скучное" };
         
-        var data = _fileHandler.WordsToLowerAndRemoveBoringWords(inputData);
+        var data = _container
+            .Resolve<IFileHandler>()
+            .WordsToLowerAndRemoveBoringWords(inputData);
         
         data.Should().BeEquivalentTo(expectedData);
     }
@@ -52,12 +52,41 @@ public class Tests
     [Test]
     public void IFIleHandler_HandleFile_Should_CorrectlyProcessText()
     {
+        var expectedData = new[] { "слово", "в", "скучное" };
+
+        var data = _container
+            .Resolve<IFileHandler>()
+            .HandleFile(Path.Combine(_filePath,
+            "IFIleHandler_HandleFile_Should_CorrectlyProcessText.txt"));
+        
+        data.Keys.Should().BeEquivalentTo(expectedData);
+    }
+
+    [Test]
+    public void IFIleHandler_HandleFile_Should_RemoveBoringWords()
+    {
         var expectedData = new[] { "слово", "скучное" };
 
-        var data = _fileHandler.HandleFile(Path.Combine(_filePath,
+        var data = _container
+            .Resolve<IFileHandler>()
+            .HandleFile(Path.Combine(_filePath,
             "IFIleHandler_HandleFile_Should_CorrectlyProcessText.txt"));
         
         data.Should().BeEquivalentTo(expectedData);
+    }
+
+    [Test]
+    public void VisualizationComposer_Should_ComposeDataCorrectly()
+    {
+        var path = Path.Combine(_filePath,
+            "VisualizationComposer_Should_ComposeDataCorrectly.txt");
+        var expectedData = PrepareComposerExpectedData(path);
+        
+        var resultData = _container
+            .Resolve<TextRectangleContainerProcessor>()
+            .ProcessFile(path);
+        
+        resultData.Should().BeEquivalentTo(expectedData);
     }
 
     [Test]
@@ -65,5 +94,20 @@ public class Tests
     {
         var layouter = _container.Resolve<ILayouter>();
         layouter.Should().NotBeNull();
+    }
+
+    private TextRectangleContainer[] PrepareComposerExpectedData(string path)
+    {
+        var data = _container
+            .Resolve<IFileHandler>()
+            .HandleFile(path);
+        var containers = new TextRectangleContainer[data.Count];
+        var rect1 = new Rectangle(new Point(340, 360), new Size(120, 80));
+        var rect2 = new Rectangle(new Point(357, 320), new Size(60, 40));
+        var rect3 = new Rectangle(new Point(417, 337), new Size(30, 20));
+        containers[0] = new TextRectangleContainer(rect1, "скучное");
+        containers[1] = new TextRectangleContainer(rect2, "слово");
+        containers[2] = new TextRectangleContainer(rect3, "в");
+        return containers;
     }
 }

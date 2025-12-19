@@ -1,8 +1,8 @@
 namespace TagsCloudContainer;
 
-public class TXTHndler : IFileHandler
+internal class TXTHndler : IFileHandler
 {
-    public string[] HandleFile(string path)
+    public Dictionary<string, int> HandleFile(string path)
     {
         var lines = ReadFile(path);
         return WordsToLowerAndRemoveBoringWords(lines);
@@ -24,7 +24,7 @@ public class TXTHndler : IFileHandler
         return parsedWords;
     }
 
-    public string[] WordsToLowerAndRemoveBoringWords(List<string> words)
+    public Dictionary<string, int> WordsToLowerAndRemoveBoringWords(List<string> words)
     {
         var frequencyDict = new Dictionary<string, int>();
         foreach (var word in words)
@@ -37,6 +37,9 @@ public class TXTHndler : IFileHandler
         // TODO фильтрация "скучных" слов
         // Пока что ничего лучше подключения либы для определения частей слов, как просят в доп заданиях, не придумал
         // Хороший ли это вариант, или стоит подумать ещё?
-        return frequencyDict.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
+        return frequencyDict
+            .OrderByDescending(x => x.Value)
+            .ThenBy(x => x.Key)
+            .ToDictionary(x => x.Key, x => x.Value);
     }
 }
