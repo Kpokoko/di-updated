@@ -12,13 +12,16 @@ public static class Program
         var fileName = client.GetImagePath();
         var imageSize = imageGeneratorInfo.ImageSize;
         var imageCenter = new Point(imageSize.Width / 2, imageSize.Height / 2);
-        var firstRectSize = new Size(30, 20);
-        var container = ContainerComposer.Compose(imageCenter, firstRectSize);
+        CloudVisualizer.PrepareGraphics(imageSize);
+        var container = ContainerComposer.Compose(imageCenter, imageGeneratorInfo.ImageSize,
+            CloudVisualizer.Graphics, imageGeneratorInfo.Font);
         
-        var wordsContainers = container
-            .Resolve<TextRectangleContainerProcessor>()
-            .ProcessFile(fileName);
+        var wordProcessor = container
+            .Resolve<TextRectangleContainerProcessor>();
         
-        CloudVisualizer.Draw(wordsContainers, imageGeneratorInfo);
+        var measurer = container
+            .Resolve<IWordMeasurer>();
+        
+        CloudVisualizer.Draw(wordProcessor, imageGeneratorInfo, fileName, measurer);
     }
 }

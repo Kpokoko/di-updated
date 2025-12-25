@@ -13,7 +13,7 @@ public class ImageGeneratorInfo
     public ImageGeneratorInfo(Color? textColor = null, Color? backgroundColor = null,
         Font? font = null, Size? imageSize = null, string? outputFileName = null)
     {
-        Font = font ?? new Font(FontFamily.GenericSansSerif, 20); // 20 — дефолтный размер
+        Font = font ?? new Font(FontFamily.GenericSansSerif, 60);
         TextColor = textColor ?? Color.Black;
         BackgroundColor = backgroundColor ?? Color.White;
         ImageSize = imageSize ?? new Size(800, 600);

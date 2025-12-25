@@ -4,21 +4,29 @@ using TagsCloudContainer;
 
 namespace TagsCloudApp;
 
-public static class CloudVisualizer
+public class CloudVisualizer
 {
-    public static void Draw(IEnumerable<TextRectangleContainer> rectangles, ImageGeneratorInfo info)
+    private static Bitmap _bitmap;
+    public static Graphics Graphics { get; private set; }
+
+    public static void PrepareGraphics(Size imageSize)
+    {
+        _bitmap = new Bitmap(imageSize.Width, imageSize.Height);
+        Graphics = Graphics.FromImage(_bitmap);
+    }
+    
+    public static void Draw(TextRectangleContainerProcessor processor,
+        ImageGeneratorInfo info,
+        string inputFile,
+        IWordMeasurer wordMeasurer)
     {
         var path = info.OutputFileName;
         var dir = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
 
-        using var bmp = new Bitmap(info.ImageSize.Width, info.ImageSize.Height);
-        using var graphics = Graphics.FromImage(bmp);
+        Graphics.Clear(info.BackgroundColor);
 
-        graphics.Clear(info.BackgroundColor);
-
-        using var font = info.Font;
         using var brush = new SolidBrush(info.TextColor);
 
         var format = new StringFormat
@@ -27,15 +35,20 @@ public static class CloudVisualizer
             LineAlignment = StringAlignment.Center
         };
 
-        foreach (var container in rectangles)
+        foreach (var container in processor.ProcessFile(inputFile, wordMeasurer))
         {
+            if (container is null)
+                continue;
             var rect = container.Rectangle;
 
-            graphics.FillRectangle(Brushes.LightBlue, rect);
-            graphics.DrawRectangle(Pens.Black, rect);
-            graphics.DrawString(container.Text, font, brush, rect, format);
+            // Graphics.FillRectangle(Brushes.LightBlue, rect);
+            // Graphics.DrawRectangle(Pens.Black, rect);
+            using var font =
+                new Font(info.Font.FontFamily, info.Font.Size * container.FontSizeScale, info.Font.Style);
+            Graphics.DrawString(container.Text, font, brush, rect, format);
         }
 
-        bmp.Save(path, ImageFormat.Bmp);
+        _bitmap.Save(path, ImageFormat.Bmp);
     }
+
 }

@@ -33,11 +33,11 @@ public class ConsoleClient : IClient
             var color = Color.FromName(input);
             if (color.IsKnownColor)
                 return color;
-            Console.WriteLine("Это не цвет, бро");
+            Console.WriteLine("Такого цвета нет, попробуй ещё раз");
         }
     }
 
-    private Font? ReadFont(string prompt, float defaultSize = 20)
+    private Font? ReadFont(string prompt, float defaultSize = 60)
     {
         while (true)
         {
@@ -47,7 +47,7 @@ public class ConsoleClient : IClient
                 return null;
             if (FontFamily.Families.Any(f => f.Name.Equals(input, StringComparison.OrdinalIgnoreCase)))
                 return new Font(input, defaultSize);
-            Console.WriteLine("Такого шрифта нет, бро. Попробуй ещё раз.");
+            Console.WriteLine("Такого шрифта нет, попробуй ещё раз");
         }
     }
 
@@ -66,8 +66,8 @@ public class ConsoleClient : IClient
             {
                 return new Size(width, height);
             }
+            Console.WriteLine("Нужно ввести два числа через пробел");
 
-            Console.WriteLine("Введи два числа через пробел, бро");
         }
     }
 
@@ -80,7 +80,7 @@ public class ConsoleClient : IClient
 
     public string GetImagePath()
     {
-        Console.WriteLine("Введите название входного файла:");
+        Console.WriteLine("Введи название входного файла:");
         var fileName = Console.ReadLine();
         while (!File.Exists(fileName))
         {
@@ -91,7 +91,7 @@ public class ConsoleClient : IClient
                 continue;
             }
             var fullPath = Path.GetFullPath(fileName);
-            Console.WriteLine($"Этот файл не найден по пути {fullPath}, повторите ввод");
+            Console.WriteLine($"Файл {fileName} не найден по пути {fullPath}, повтори ввод");
             fileName = Console.ReadLine();
         }
         return fileName;

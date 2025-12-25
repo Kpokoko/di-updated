@@ -1,3 +1,4 @@
+using System.Drawing;
 using TagsCloudVisualization;
 
 namespace TagsCloudContainer;
@@ -16,18 +17,21 @@ public class TextRectangleContainerProcessor
         this._rectangleSizeCalculator = calculator;
     }
     
-    public List<TextRectangleContainer>ProcessFile(string path)
+    public IEnumerable<TextRectangleContainer?> ProcessFile(string path, IWordMeasurer wordMeasurer)
     {
         var redData = _fileHandler.HandleFile(path);
-        var resultData = new List<TextRectangleContainer>();
 
         foreach (var wordInfo in redData)
         {
-            var rectSize = _rectangleSizeCalculator.CalculateNextRectangleSize(wordInfo.Value);
-            var rect = _layouter.PutNextRectangle(rectSize);
-            resultData.Add(new TextRectangleContainer(rect, wordInfo.Key));
-        }
+            var rectSize = _rectangleSizeCalculator.CalculateNextRectangleSize(wordInfo, wordMeasurer, out var scale);
+            if (rectSize == Size.Empty)
+            {
+                yield return null;
+                continue;
+            }
 
-        return resultData;
+            var rect = _layouter.PutNextRectangle(rectSize);
+             yield return new TextRectangleContainer(rect, wordInfo.Key, scale);
+        }
     }
 }

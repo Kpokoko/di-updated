@@ -10,7 +10,7 @@ namespace TagsCloudContainer;
 public class Tests
 {
     private Point _center;
-    private Size _firstRectSize;
+    private Size _imageSize;
     private string _filePath = "TestData";
     private IContainer _container;
     
@@ -18,9 +18,12 @@ public class Tests
     public void Setup()
     {
         _center = new Point(400, 400);
-        _firstRectSize = new Size(30, 20);
+        _imageSize = new Size(800, 800);
+        using var bitmap = new Bitmap(_imageSize.Width, _imageSize.Height);
+        using var graphics = Graphics.FromImage(bitmap);
+        var font = new Font(FontFamily.GenericSansSerif, 20);
         
-        _container = ContainerComposer.Compose(_center, _firstRectSize);
+        _container = ContainerComposer.Compose(_center, _imageSize, graphics, font);
     }
     
     [Test]
@@ -84,7 +87,7 @@ public class Tests
         
         var resultData = _container
             .Resolve<TextRectangleContainerProcessor>()
-            .ProcessFile(path);
+            .ProcessFile(path, _container.Resolve<IWordMeasurer>());
         
         resultData.Should().BeEquivalentTo(expectedData);
     }
@@ -105,9 +108,9 @@ public class Tests
         var rect1 = new Rectangle(new Point(340, 360), new Size(120, 80));
         var rect2 = new Rectangle(new Point(357, 320), new Size(60, 40));
         var rect3 = new Rectangle(new Point(417, 337), new Size(30, 20));
-        containers[0] = new TextRectangleContainer(rect1, "скучное");
-        containers[1] = new TextRectangleContainer(rect2, "слово");
-        containers[2] = new TextRectangleContainer(rect3, "в");
+        containers[0] = new TextRectangleContainer(rect1, "скучное", 1);
+        containers[1] = new TextRectangleContainer(rect2, "слово",0.5f );
+        containers[2] = new TextRectangleContainer(rect3, "в",0.25f);
         return containers;
     }
 }
