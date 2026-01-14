@@ -40,15 +40,12 @@ public class CloudVisualizer
             if (container is null)
                 continue;
             var rect = container.Rectangle;
-
-            // Graphics.FillRectangle(Brushes.LightBlue, rect);
-            // Graphics.DrawRectangle(Pens.Black, rect);
             using var font =
                 new Font(info.Font.FontFamily, info.Font.Size * container.FontSizeScale, info.Font.Style);
             Graphics.DrawString(container.Text, font, brush, rect, format);
         }
 
-        _bitmap.Save(path, ImageFormat.Bmp);
+        _bitmap.Save(path);
     }
 
 }

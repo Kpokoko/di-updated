@@ -12,13 +12,19 @@ public class ConsoleClient : IClient
         var font = ReadFont("Введите название шрифта (enter для дефолтного значения):");
         var imageSize = ReadSize("Введите размер изображения через пробел двумя числами (enter для дефолтного значения):");
         var outputFile = ReadString("Введите желаемое имя для выходного файла (enter для дефолтного значения):");
+        var banWords =
+            ReadList(
+                "Введите через запятую слова, которые хотите игнорировать (enter, если хотите видеть все слова)");
+        var outputFileFormat = ReadFormat("Введите желаемый формат выходного файла (enter для дефолтного значения)");
 
         return new ImageGeneratorInfo(
             textColor,
             bgColor,
             font,
             imageSize,
-            outputFile
+            outputFile,
+            banWords,
+            outputFileFormat
         );
     }
 
@@ -76,6 +82,47 @@ public class ConsoleClient : IClient
         Console.WriteLine(prompt);
         var input = Console.ReadLine();
         return string.IsNullOrEmpty(input) ? null : input;
+    }
+
+    private List<string>? ReadList(string prompt)
+    {
+        Console.WriteLine(prompt);
+        var input = Console.ReadLine();
+        return string.IsNullOrEmpty(input) ? new List<string>() : input.Split(',').Select(s => s.Trim()).ToList();
+    }
+
+    private string? ReadFormat(string prompt)
+    {
+        Console.WriteLine(prompt);
+        var input = Console.ReadLine();
+        if (string.IsNullOrEmpty(input))
+            return null;
+        var isCorrectFileFormatInputed = false;
+        while (!isCorrectFileFormatInputed)
+        {
+            if (input[0] == '.')
+                input = input[1..];
+            switch (input)
+            {
+                case "png":
+                    isCorrectFileFormatInputed = true;
+                    break;
+                case "jpg":
+                    isCorrectFileFormatInputed = true;
+                    break;
+                case "jpeg":
+                    isCorrectFileFormatInputed = true;
+                    break;
+                case "bmp":
+                    isCorrectFileFormatInputed = true;
+                    break;
+                default:
+                    Console.WriteLine("Неверный формат, повторите попытку!");
+                    input = Console.ReadLine();
+                    break;
+            }
+        }
+        return input;
     }
 
     public string GetImagePath()

@@ -14,7 +14,7 @@ public static class Program
         var imageCenter = new Point(imageSize.Width / 2, imageSize.Height / 2);
         CloudVisualizer.PrepareGraphics(imageSize);
         var container = ContainerComposer.Compose(imageCenter, imageGeneratorInfo.ImageSize,
-            CloudVisualizer.Graphics, imageGeneratorInfo.Font);
+            CloudVisualizer.Graphics, imageGeneratorInfo.Font, imageGeneratorInfo.BanWords);
         
         var wordProcessor = container
             .Resolve<TextRectangleContainerProcessor>();
