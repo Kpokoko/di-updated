@@ -10,9 +10,9 @@ public static class ContainerComposer
     {
         var builder = new ContainerBuilder();
         builder.RegisterInstance(new CircularCloudLayouter(center)).As<ILayouter>();
-        builder.RegisterInstance(new TXTHndler()).As<IFileHandler>();
+        builder.RegisterInstance(new TxtReader()).As<IFileReader>();
         builder.RegisterInstance(new RectangleSizeCalculator(imageSize));
-        builder.RegisterInstance(banWords);
+        builder.RegisterInstance(new BoringWordsProcessor(banWords));
         builder.RegisterType<TextRectangleContainerProcessor>();
         builder.RegisterInstance(new WordMeasurer(graphics, font)).As<IWordMeasurer>();
         return builder.Build();

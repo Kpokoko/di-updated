@@ -5,17 +5,23 @@ namespace TagsCloudApp;
 
 public class ConsoleClient : IClient
 {
+    private const string ReadFontColorPrompt = "Введите английское название цвета шрифта (enter для дефолтного значения):";
+    private const string ReadBGColorPrompt = "Введите английское название цвета фона (enter для дефолтного значения):";
+    private const string ReadFontNamePrompt = "Введите название шрифта (enter для дефолтного значения):";
+    private const string ReadFontSizePrompt = "Введите размер изображения через пробел двумя числами (enter для дефолтного значения):";
+    private const string ReadOutputFileNamePrompt = "Введите желаемое имя для выходного файла (enter для дефолтного значения):";
+    private const string ReadBanWordsPrompt = "Введите через запятую слова, которые хотите игнорировать (enter, если хотите видеть все слова)";
+    private const string ReadOutputFileFormat = "Введите желаемый формат выходного файла (enter для дефолтного значения)";
+    
     public ImageGeneratorInfo GetImageGeneratorInfo()
     {
-        var textColor = ReadColor("Введите английское название цвета шрифта (enter для дефолтного значения):");
-        var bgColor = ReadColor("Введите английское название цвета фона (enter для дефолтного значения):");
-        var font = ReadFont("Введите название шрифта (enter для дефолтного значения):");
-        var imageSize = ReadSize("Введите размер изображения через пробел двумя числами (enter для дефолтного значения):");
-        var outputFile = ReadString("Введите желаемое имя для выходного файла (enter для дефолтного значения):");
-        var banWords =
-            ReadList(
-                "Введите через запятую слова, которые хотите игнорировать (enter, если хотите видеть все слова)");
-        var outputFileFormat = ReadFormat("Введите желаемый формат выходного файла (enter для дефолтного значения)");
+        var textColor = ReadColor(ReadFontColorPrompt);
+        var bgColor = ReadColor(ReadBGColorPrompt);
+        var font = ReadFont(ReadFontNamePrompt);
+        var imageSize = ReadSize(ReadFontSizePrompt);
+        var outputFile = ReadString(ReadOutputFileNamePrompt);
+        var banWords = ReadList(ReadBanWordsPrompt);
+        var outputFileFormat = ReadFormat(ReadOutputFileFormat);
 
         return new ImageGeneratorInfo(
             textColor,
